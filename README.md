@@ -13,9 +13,29 @@ It is recommended that you only use this client as a parameter to the `DDPContex
 If you want to execute methods manually (without the provided hooks) look at the options below.
 
 ```tsx
-import DDP, { DDPContextProvider } from "ddp";
+import DDP, { DDPContextProvider } from "ddp-react";
 
 const client = DDP(options);
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
+	<React.StrictMode>
+		<DDPContextProvider client={client} placeholder="Loading...">
+			<App />
+		</DDPContextProvider>
+	</React.StrictMode>
+);
+```
+
+Unfortunately, bundling a Worker in an NPM project is difficult, so you will probably need to provide the worker yourself.
+You could first try without and if that does not work try the example below.
+
+The following implementation works for Vite:
+
+```tsx
+import DDPWorker from "ddp-react/dist/worker?worker";
+import DDP, { DDPContextProvider } from "ddp-react";
+
+const client = DDP(options, new DDPWorker());
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
 	<React.StrictMode>
@@ -33,7 +53,7 @@ Provides more flexibility by exposing the `simpleDDP` construction while still r
 #### Main thread
 
 ```tsx
-import { mainThreadWrapper, DDPContextProvider } from "ddp";
+import { mainThreadWrapper, DDPContextProvider } from "ddp-react";
 import ReactDOM from "react-dom/client";
 
 const worker = new Worker(new URL(path, import.meta.url), { type: "module" });
@@ -52,7 +72,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 #### Worker
 
 ```typescript
-import { workerWrapper, WorkerWrapper } from "ddp";
+import { workerWrapper, WorkerWrapper } from "ddp-react";
 import simpleDDP from "simpleDDP";
 
 const client = new simpleDDP(options);
@@ -69,9 +89,13 @@ const collection = wrappedClient.collection("collection name");
 Most flexible solution, but does not get the benefits of running on a separate thread.
 
 ```tsx
-import { mainThreadWrapper, MainThreadWrapper, DDPContextProvider } from "ddp";
 import ReactDOM from "react-dom/client";
 import simpleDDP from "simpleDDP";
+import {
+	mainThreadWrapper,
+	MainThreadWrapper,
+	DDPContextProvider,
+} from "ddp-react";
 
 const client = new simpleDDP(options);
 // Don't do this in a component or use the `useMemo` hook
