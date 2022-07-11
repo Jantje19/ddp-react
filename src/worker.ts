@@ -1,6 +1,5 @@
 import simpleDDP from "simpleddp";
 import { expose } from "comlink";
-import ws from "isomorphic-ws";
 
 import WorkerWrapper from "./wrappers/worker";
 
@@ -18,7 +17,7 @@ self.addEventListener(
 		switch (type) {
 			case "expose":
 				expose(
-					new WorkerWrapper(new simpleDDP({ ...data, SocketConstructor: ws }))
+					new WorkerWrapper(new simpleDDP({ ...data, SocketConstructor: WebSocket }))
 				);
 				break;
 			default:
